@@ -1,0 +1,15 @@
+name = "url-shortener-fetcher"
+type = "javascript"
+zone_id = "618820098edb4418119c0deb50603082"
+account_id = "318cdaa782c2aa61af49d83b4cc8bc37"
+route = "shrtr.cloud/*"
+workers_dev = true
+compatibility_date = "2021-09-29"
+kv_namespaces = [
+  { binding = "KEYS", id = "154815dc06ba40fcbff0449b91ab787f", preview_id = "154815dc06ba40fcbff0449b91ab787f" }
+]
+
+[build]
+command = "npm install && npm run build"
+[build.upload]
+format = "service-worker"
