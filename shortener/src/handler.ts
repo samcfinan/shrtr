@@ -13,7 +13,7 @@ declare const KEYS: KVNamespace
 // Env vars
 declare const BASE_URL: string
 
-const nanoid = customAlphabet(lowercase + numbers, 16)
+const nanoid = customAlphabet(lowercase + numbers, 6)
 
 enum Modes {
   IDENTIFIABLE = 'identifiable',
@@ -81,7 +81,7 @@ export async function handleRequest(request: Request): Promise<Response> {
       exists = record !== null
     } while (exists)
 
-    await KEYS.put(key, url)
+    await KEYS.put(key, url, { expirationTtl: 86400 })
 
     const shortenedURL = `${BASE_URL}/${key}`
 
