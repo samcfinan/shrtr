@@ -24,11 +24,11 @@ interface RequestBody {
   url: string
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET,HEAD,POST,OPTIONS',
-  'Access-Control-Max-Age': '86400',
-}
+const headers = new Headers()
+headers.set('Access-Control-Allow-Origin', '*')
+headers.set('Access-Control-Allow-Methods', 'GET,HEAD,POST,OPTIONS')
+headers.set('Access-Control-Max-Age', '86400')
+headers.set('Content-Type', 'application/json')
 
 const validator = new Validator({
   type: 'object',
@@ -59,7 +59,7 @@ export async function handleRequest(request: Request): Promise<Response> {
           },
         }),
         {
-          headers: { 'content-type': 'application/json', ...corsHeaders },
+          headers,
           status: 400,
         },
       )
@@ -82,13 +82,13 @@ export async function handleRequest(request: Request): Promise<Response> {
     const shortenedURL = `${BASE_URL}/${key}`
 
     const res = new Response(JSON.stringify({ mode, url, key, shortenedURL }), {
-      headers: { 'content-type': 'application/json', ...corsHeaders },
+      headers,
       status: 200,
     })
     return res
   } catch (err) {
     return new Response(JSON.stringify({ error: err }), {
-      headers: { 'content-type': 'application/json', ...corsHeaders },
+      headers,
       status: 500,
     })
   }
