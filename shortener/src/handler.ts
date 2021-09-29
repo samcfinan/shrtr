@@ -50,6 +50,20 @@ export async function handleRequest(request: Request): Promise<Response> {
   try {
     const body: RequestBody = await request.json()
     const validation = validator.validate(body)
+    if (!validation.valid) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: 'err_validation',
+            message: validation.errors,
+          },
+        }),
+        {
+          headers: { 'content-type': 'application/json', ...corsHeaders },
+          status: 400,
+        },
+      )
+    }
 
     const { mode, url } = body
 
@@ -67,16 +81,15 @@ export async function handleRequest(request: Request): Promise<Response> {
 
     const shortenedURL = `${BASE_URL}/${key}`
 
-    const res = new Response(
-      JSON.stringify({ mode, url, key, shortenedURL, validation }),
-      {
-        headers: { 'content-type': 'application/json', ...corsHeaders },
-      },
-    )
+    const res = new Response(JSON.stringify({ mode, url, key, shortenedURL }), {
+      headers: { 'content-type': 'application/json', ...corsHeaders },
+      status: 200,
+    })
     return res
   } catch (err) {
     return new Response(JSON.stringify({ error: err }), {
       headers: { 'content-type': 'application/json', ...corsHeaders },
+      status: 500,
     })
   }
 }
