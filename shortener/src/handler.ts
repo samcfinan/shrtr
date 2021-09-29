@@ -65,7 +65,11 @@ export async function handleRequest(request: Request): Promise<Response> {
       )
     }
 
-    const { mode, url } = body
+    const { mode } = body
+    let { url } = body
+    if (!url.startsWith('http')) {
+      url = 'https://' + url
+    }
 
     let key: string
 
