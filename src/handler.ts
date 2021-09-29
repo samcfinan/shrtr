@@ -6,6 +6,7 @@ import {
 } from 'unique-names-generator'
 import { customAlphabet } from 'nanoid'
 import { lowercase, numbers } from 'nanoid-dictionary'
+import { Validator } from '@cfworker/json-schema'
 
 // Cloudflare K/V
 declare const KEYS: KVNamespace
@@ -14,14 +15,13 @@ declare const BASE_URL: string
 
 const nanoid = customAlphabet(lowercase + numbers, 16)
 
-interface RequestBody {
-  mode: Modes
-  url: string
-}
-
 enum Modes {
   IDENTIFIABLE = 'identifiable',
   RANDOM = 'random',
+}
+interface RequestBody {
+  mode: Modes
+  url: string
 }
 
 const corsHeaders = {
@@ -30,28 +30,55 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 }
 
+const validator = new Validator({
+  type: 'object',
+  required: ['mode', 'url'],
+  properties: {
+    mode: {
+      type: 'string',
+      enum: [Modes.IDENTIFIABLE, Modes.RANDOM],
+      nullable: false,
+    },
+    url: {
+      type: 'string',
+      nullable: false,
+    },
+  },
+})
+
 export async function handleRequest(request: Request): Promise<Response> {
-  const body: RequestBody = await request.json()
-  const { mode, url } = body
+  try {
+    const body: RequestBody = await request.json()
+    const validation = validator.validate(body)
 
-  let key: string
+    const { mode, url } = body
 
-  // Check if key already exists, if so, regenerate
-  let exists = false
-  do {
-    key = generateKey(mode)
-    const record = await KEYS.get(key, { type: 'text' })
-    exists = record !== null
-  } while (exists)
+    let key: string
 
-  await KEYS.put(key, url)
+    // Check if key already exists, if so, regenerate
+    let exists = false
+    do {
+      key = generateKey(mode)
+      const record = await KEYS.get(key, { type: 'text' })
+      exists = record !== null
+    } while (exists)
 
-  const shortenedURL = `${BASE_URL}/${key}`
+    await KEYS.put(key, url)
 
-  const res = new Response(JSON.stringify({ mode, url, key, shortenedURL }), {
-    headers: { 'content-type': 'application/json', ...corsHeaders },
-  })
-  return res
+    const shortenedURL = `${BASE_URL}/${key}`
+
+    const res = new Response(
+      JSON.stringify({ mode, url, key, shortenedURL, validation }),
+      {
+        headers: { 'content-type': 'application/json', ...corsHeaders },
+      },
+    )
+    return res
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err }), {
+      headers: { 'content-type': 'application/json', ...corsHeaders },
+    })
+  }
 }
 
 const generateKey = (mode: Modes): string => {
