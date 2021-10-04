@@ -104,6 +104,7 @@ const generateKey = (mode: Modes): string => {
       dictionaries: [adjectives, colors, animals],
       length: 3,
       separator: '',
+      style: 'capital',
     })
   } else {
     return nanoid()
