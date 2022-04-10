@@ -12,7 +12,7 @@ The economics of Cloudflare Workers and K/V allow you to run your own for free, 
 
 ## Usage
 
-1. Install & configure Wrangler.
+1. Install & configure [Wrangler](https://github.com/cloudflare/wrangler).
 2. Replace the values in the workers' `wrangler.toml` files with your Cloudflare zone ID, account ID, path, and K/V ID.
 3. Deploy workers.
 4. Deploy frontend to Cloudflare Pages or similar free static hosting.
