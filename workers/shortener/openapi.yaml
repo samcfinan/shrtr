@@ -1,0 +1,101 @@
+openapi: 3.1.2
+info:
+  title: Shrtr API
+  description: Shrtr API spec
+  version: 0.0.1
+servers:
+  - url: https://api.shrtr.cloud
+paths:
+  /generate:
+    post:
+      operationId: GenerateShortURL
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mode
+                - url
+              properties:
+                mode:
+                  type: string
+                  enum:
+                    - random
+                    - identifiable
+                  description: Random mode generates a 6-character random URL path. Identifiable is human readable.
+                url: 
+                  type: string
+                  description: URL to redirect to. Can be prefixed with https or not.
+                  example: 
+                    - https://www.shrtr.cloud
+                    - shrtr.cloud
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - mode
+                  - url
+                  - key
+                  - shortenedURL
+                properties:
+                  mode:
+                    type: string
+                    example: identifiable
+                    description: The mode the URL was generated using.
+                  url:
+                    type: string
+                    example: https://shrtr.cloud
+                    description: The URL to shorten.
+                  key:
+                    type: string
+                    example: whtcfn
+                    description: The unique shortened key used to access the URL.
+                  shortenedURL:
+                    type: string
+                    example: https://shrtr.cloud/whtcfn
+                    description: The full shortened URL path.
+        "400":
+          $ref: "#/components/responses/400"
+
+components:
+  schemas:
+    ErrorObject:
+      type: object
+      x-sensitive: false
+      properties:
+        error:
+          type: object
+          x-sensitive: false
+          properties:
+            error:
+              type: string
+              x-sensitive: false
+              description: System-friendly error code for this Error.
+            message:
+              type: string
+              x-sensitive: false
+              description: |-
+                Human-friendly error message for this Error.
+                This error message is not intended for end-user presentation.
+          required:
+            - code
+            - message
+          additionalProperties: false
+      required:
+        - error
+      additionalProperties: false
+  responses:
+    "400":
+      description:
+        Request provided was not properly formed or did not have all the
+        required information. See the response body error property for more
+        details
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorObject"
