@@ -19,4 +19,4 @@ The economics of Cloudflare Workers and K/V allow you to run your own for free, 
 
 ## API
 
-The workers are also accessible via a public API documented [here](./workers/shortener/index.html) and via an [OpenAPI spec](./workers/shortener/openapi.yaml).
+The workers are also accessible via a public API documented [here](https://samcfinan.github.io/shrtr/) and via an [OpenAPI spec](./workers/shortener/openapi.yaml).
